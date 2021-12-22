@@ -14,3 +14,4 @@ function sol14!(r)
     back_to_xy!(r, a, s)
 end
 println("OK")
+#s
