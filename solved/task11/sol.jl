@@ -6,12 +6,15 @@ using HorizonSideRobots
 include("../jujuju.jl")
 
 function sol11!(r)
-    movvenm!(r, 1, 1)
+    x, y = CORNER!(r)
+    back_to_xy!(r, x+1, y+1)
     putmarker!(r)
-    for side in [Sud, Ost, Nord]
-        movven!(r, side, 2)
-        putmarker!(r)
-    end
-    movvenm!(r, -1, 1)
+    back_to_xy!(r, x-1, y+1)
+    putmarker!(r)
+    back_to_xy!(r, x+1, y-1)
+    putmarker!(r)
+    back_to_xy!(r, x-1, y-1)
+    putmarker!(r)
+    back_to_xy!(t, x, y)
 end
 println("OK")

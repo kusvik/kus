@@ -6,20 +6,20 @@ using HorizonSideRobots
 include("../jujuju.jl")
 
 function sol10!(r)
-    t = 0
+    t = ismarker(r) * temperature(r)
     side = Ost
     k = 0
-    while !isborder(r, side)
-        while !isborder(r, side)
+    start = false
+    while !isborder(r, side) || !start
+        while bool(MOVE!(r, side))
             if ismarker(r)
                 t += temperature(r)
             end
-            move!(r, side)
         end
         if ismarker(r)
             t += temperature(r)
         end
-        if !isborder(r, Nord)
+        if bool(MOVE!(r, Nord))
             side = opposite_side(side)
             move!(r, Nord)
         end

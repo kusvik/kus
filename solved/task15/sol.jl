@@ -5,7 +5,7 @@ using HorizonSideRobots
 
 include("../jujuju.jl")
 
-function sq!(r)
+function sol15!(r)
     a, s = CORNER!(r)
     for i in [Nord, Ost, Sud, West]
         MARK_FKN_LINE!(r, i)

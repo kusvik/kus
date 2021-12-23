@@ -62,7 +62,7 @@ function MOVE!(r, side)
             g += 1
         end
     end
-    return x == x1 && y == y1
+    return (x2 == 0 && y2 == 0) * (-2) + abs(x - x1 + y - y1) + 1
 end
 
 function ray!(r, side)
@@ -74,6 +74,12 @@ function ray!(r, side)
         s += 1 
     end
     return s
+end
+
+function RAY!(r, side)
+    while MOVE!(r, side) != 0
+        putmarker!(r)
+    end
 end
 
 function rayn!(r, side, n)
@@ -96,11 +102,11 @@ function markline!(r, side)
 end
 
 function MARK_FKN_LINE!(r, side)
-    while MOVE!(r, side)
+    while MOVE!(r, side) != 0
         putmarker!(r)
     end
 
-    while MOVE!(r, opposite_side(side))
+    while MOVE!(r, opposite_side(side)) != 0
         putmarker!(r)
     end
 end
@@ -114,19 +120,26 @@ function movve!(r, side)
     return s
 end
 
-function movven!(r, side, n)
+function MOVVE!(r, side)
+    while MOVE!(r, side) != 0
+        c = 0
+    end
+end
+
+function movven!(r, side, n) # только если можно попасть
     s = 0
+    s0 = -1
     if n < 0
         side = opposite_side(side)
         n = -n
     end
-    while s < n
-        MOVE!(r, side)
-        s += 1
+    while s < n && s0 != s
+        s0 = s
+        s += MOVE!(r, side)
     end
 end
 
-function movvenm!(r, n, m)
+function movvenm!(r, n, m) # только если можно попасть в нее и угловые
     side1 = Nord
     side2 = West
     if n < 0 
@@ -167,14 +180,18 @@ function difcorner!(r, n)
     return d, s
 end
 
-function CORNER!(r)
+function CORNER!(r) # работает только при условии, что нет отделенных клеток граничащих с рамкой
     f = 0
     d = 0
-    while MOVE!(r, Sud)
-        f += 1
+    c = 1
+    while c != 0
+        c = MOVE!(r, Sud)
+        f += c
     end
-    while MOVE!(r, Ost)
-        d += 1
+    c = 1
+    while c != 0
+        c = MOVE!(r, Ost)
+        d += c
     end
     return f, d
 end
@@ -229,18 +246,35 @@ end
 
 function find_marker!(r, side, n)
     k = 0
+    c = 1
     if ismarker(r)
         return true
     else
-        while k != n && !ismarker(r)
-            k += 1
-            MOVE!(r, side)
+        while k <= n && !ismarker(r) && c != 0
+            c = MOVE!(r, side)
+            k += c
         end
-        return ismarker(r)
+        if k <= n 
+            return ismarker(r)
+        else
+            return false
+        end
     end
 end
 
-function back_to_xy!(r, x, y)
+function back_to_xy!(r, x, y) ### (CORNER!) + в клетку можно попасть
     CORNER!(r)
     movvenm!(r, x, y)
+end
+
+function passer!(r, side0)
+    k = 0
+    side = next_side(side0)
+    while isborder(r, side0)
+        movven!(r, side, k)
+        side = opposite_side(side)
+        k += 1
+    end
+    move!(r, side0)
+    movven!(r,opposite_side(side), (k+1)÷2)
 end
